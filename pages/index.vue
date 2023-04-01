@@ -18,12 +18,12 @@
         </div> -->
         <div class="row no-gutter d-flex align-items-stretch h-100 _w-100  position-absolute position-fixed h-100">
             <div class="col-2 col-md-3 overflow-auto">
-                <div class="ps-3 h-100 bg-white scroll shadow pe-0 me-0 navbar-collapse collapse-horizontal"
+                <div class="ps-0 ps-md-3 h-100 bg-white scroll shadow pe-0 me-0 navbar-collapse collapse-horizontal"
                     _role="navigation" id="menu" style="max-height:100vh;padding-top:5rem;overflow:auto;">
                     <div v-for="x in menu" :key="x">
                         <hr v-if="x.title == 'divider'" />
                         <div v-else
-                            class="fs-6 p-0 px-md-2 rounded py-3 w-100 me-0  menu-hover text-secondary pe-cursor d-flex justify-content-center justify-content-md-start align-items-center"
+                            class="fs-6 p-0 px-md-2 py-2 py-md-3 w-100 me-0  menu-hover text-secondary pe-cursor d-flex justify-content-center justify-content-md-start align-items-center"
                             :class="x.title == 'Dashboard' ? 'bg-purple text-light' : 'bg-white gray'">
                             <Icon :icon="x.icon" class="fs-5" />
                             <span class="d-none d-md-block ms-3">
@@ -47,7 +47,7 @@
                         </div>
                     </div>
                     <div class="py-5 mt-3 w-100">
-                        <span class="text-nowrap h1 fw-bold purple">Update Medical Record</span><br>
+                        <span class="_text-nowrap h1 fw-bold purple">Update Medical Record</span><br>
                         <span class="small gray">
                             Click the tabs to view and edit patent medical details
                         </span>
@@ -269,19 +269,19 @@ export default {
 
 .scroll::-webkit-scrollbar-thumb {
     background-color: darkgrey;
-    display: hidden;
+    visibility: hidden;
 }
 
 .scroll::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 3px;
+    // height: 10px;
 }
 
 body {
     background-color: lightgray;
-
+    font-size: 12px;
     @media(max-width:768px) {
-        font-size: 10px
+        font-size: 11px
     }
 }
 
