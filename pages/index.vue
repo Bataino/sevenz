@@ -20,12 +20,12 @@
             <div class="col-2 col-md-3 overflow-auto">
                 <div class="ps-3 h-100 bg-white scroll shadow _navbar navbar-collapse collapse-horizontal"
                     _role="navigation" id="menu" style="max-height:100vh;padding-top:5rem;overflow:auto;">
-                    <div v-for="x in menu" :key="x">
+                    <div v-for="x in menu" :key="x" :class="x.title == 'Dashboard' ? 'bg-purple text-white' : 'bg-white gray'">
                         <hr v-if="x.title == 'divider'" />
                         <div v-else
-                            class="fs-6 p-0 p-md-2 py-3 menu-hover text-secondary pe-cursor d-flex justify-content-center justify-content-md-start align-items-center">
+                            class="fs-6 p-0 px-md-2 py-3 _py-md-4  menu-hover text-secondary pe-cursor d-flex justify-content-center justify-content-md-start align-items-center">
                             <Icon :icon="x.icon" class="fs-5" />
-                            <span class="d-none d-md-block ms-2">
+                            <span class="d-none d-md-block ms-3">
                                 {{ x.title }}
                             </span>
                         </div>
@@ -33,13 +33,13 @@
                 </div>
             </div>
             <div class="col-10 col-md-9 _bg-danger">
-                <div class="overflow-auto pb-5" style="max-height:100vh">
+                <div class="overflow-auto pb-5 w-100" style="max-height:100vh;min-width:100%">
                     <div class="pt-4 bg-succes">
-                        <div class="float-end d-flex justify-content-between align-items-center" style="min-width:300px">
+                        <div class="float-end d-flex justify-content-between align-items-center pe-4" style="min-width:300px">
                             <span class="purple-light fw-bold">Take a tour</span>
                             <Icon icon="ic:round-mail" class="fs-3 purple" />
                             <Icon icon="zondicons:notification" class="fs-3  purple-light" />
-                            <img class="rounded-circle" width="50" height="50" />
+                            <img class="rounded-circle " src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=600" width="50px" height="50px" />
                         </div>
                     </div>
                     <div class="py-5 mt-3 w-100">
@@ -114,12 +114,13 @@
 
 <script>
 import { Icon } from "@iconify/vue"
-ort Widget from "@/lib/widget"
+import Widget from "@/lib/widget"
+
 export default {
     data() {
         return {
             menu: [
-                { title: "DashBoard", icon: "ic:round-dashboard", link: "" },
+                { title: "Dashboard", icon: "ic:round-dashboard", link: "" },
                 { title: "Profile", icon: "mdi:user", link: "" },
                 { title: "Services", icon: "grommet-icons:dropbox", link: "" },
                 { title: "Medical Record", icon: "solar:clipboard-add-bold", link: "" },
@@ -141,6 +142,7 @@ export default {
     },
     methods: {
         async getCategories() {
+            Widget.openLoading()
             const query = gql`query {
                 investigation_types {
                         id
@@ -152,6 +154,7 @@ export default {
                     }
                 }`
             const { data, error } = await useAsyncQuery(query)
+            Widget.dismiss()
             this.tests = data._value.investigation_types
             console.log("Invest", data)
             // this.dets
@@ -195,27 +198,29 @@ export default {
             // setTimeout(() => this.$nuxt.$loading.finish(), 3000)
             let selected = []
             this.tests.forEach((test) => {
-                selected = [ ...selected , ...test.investigations.filter((e) => e.isSelected)]
-            }) 
+                selected = [...selected, ...test.investigations.filter((e) => e.isSelected)]
+            })
             console.log(selected)
             const variables = {
-                ctscan:this.ct_scan,
-                mri:this.mri,
-                inv:selected.map((e) => e.id),
-                dev:"Abdulbateen"
+                ctscan: this.ct_scan,
+                mri: this.mri,
+                inv: selected.map((e) => e.id),
+                dev: "Abdulbateen"
             }
 
             const { data, error } = await useAsyncQuery(query, variables)
             console.log(data, error)
-            this.$toast.show("Bataino")
-            
+            const { $nt } = useNuxtApp()
+            $nt.show("Bataino")
+
         }
     },
-    beforeMount() {
+    async beforeMount() {
+        // this.$root.$loading.start();
         if (localStorage.getItem("token") == undefined || localStorage.getItem("token") == null || !localStorage.getItem("token")) {
-            this.login()
+            await this.login()
         }
-        this.getCategories()
+        await this.getCategories()
         console.log("Token", localStorage.getItem("token"))
 
 
@@ -250,6 +255,10 @@ export default {
 
 body {
     background-color: lightgray;
+
+    @media(max-width:768px) {
+        font-size: 10px
+    }
 }
 
 input[type=checkbox] {

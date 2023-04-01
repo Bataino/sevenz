@@ -19,11 +19,9 @@ export default defineNuxtConfig({
     // 'bootstrap-vue/nuxt'
     modules: [
         '@nuxtjs/apollo', 
-        // '@nuxtjs/toast'
+        '@cssninja/nuxt-toaster'
     ],
-    plugins: [ 
-        '@/plugins/vue-plugin.js'
-      ],
+    plugins: [],
     apollo: {
         authType: "Bearer",
         authHeader: "Authorization",
@@ -35,4 +33,5 @@ export default defineNuxtConfig({
             }
         },
     },
+    
 })
