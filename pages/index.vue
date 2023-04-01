@@ -18,12 +18,13 @@
         </div> -->
         <div class="row no-gutter d-flex align-items-stretch h-100 _w-100  position-absolute position-fixed h-100">
             <div class="col-2 col-md-3 overflow-auto">
-                <div class="ps-3 h-100 bg-white scroll shadow _navbar navbar-collapse collapse-horizontal"
+                <div class="ps-3 h-100 bg-white scroll shadow pe-0 me-0 navbar-collapse collapse-horizontal"
                     _role="navigation" id="menu" style="max-height:100vh;padding-top:5rem;overflow:auto;">
-                    <div v-for="x in menu" :key="x" :class="x.title == 'Dashboard' ? 'bg-purple text-white' : 'bg-white gray'">
+                    <div v-for="x in menu" :key="x">
                         <hr v-if="x.title == 'divider'" />
                         <div v-else
-                            class="fs-6 p-0 px-md-2 py-3 _py-md-4  menu-hover text-secondary pe-cursor d-flex justify-content-center justify-content-md-start align-items-center">
+                            class="fs-6 p-0 px-md-2 rounded py-3 w-100 me-0  menu-hover text-secondary pe-cursor d-flex justify-content-center justify-content-md-start align-items-center"
+                            :class="x.title == 'Dashboard' ? 'bg-purple text-light' : 'bg-white gray'">
                             <Icon :icon="x.icon" class="fs-5" />
                             <span class="d-none d-md-block ms-3">
                                 {{ x.title }}
@@ -35,11 +36,14 @@
             <div class="col-10 col-md-9 _bg-danger">
                 <div class="overflow-auto pb-5 w-100" style="max-height:100vh;min-width:100%">
                     <div class="pt-4 bg-succes">
-                        <div class="float-end d-flex justify-content-between align-items-center pe-4" style="min-width:300px">
+                        <div class="float-end d-flex justify-content-between align-items-center pe-4"
+                            style="min-width:300px">
                             <span class="purple-light fw-bold">Take a tour</span>
                             <Icon icon="ic:round-mail" class="fs-3 purple" />
                             <Icon icon="zondicons:notification" class="fs-3  purple-light" />
-                            <img class="rounded-circle " src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=600" width="50px" height="50px" />
+                            <img class="rounded-circle "
+                                src="https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=600"
+                                style="width:50px;height:50px" />
                         </div>
                     </div>
                     <div class="py-5 mt-3 w-100">
@@ -73,14 +77,17 @@
 
                         <div>
                             <div class="row">
+                                <small class="text-danger my-2" v-if="!ct_scan || !mri">
+                                    * CT Scan and MRI types need to be selected
+                                </small>
                                 <div class="col-12 col-md-6">
                                     <div class="form-group">
                                         <label class="text-secondary mb-2">
                                             CT San
                                         </label>
-                                        <select class="form-select text-secondary" v-model="ct_scan">
+                                        <select class="form-select text-secondary" required v-model="ct_scan">
                                             <option :value="null" disabled>* Specify</option>
-                                            <option class="">Scan needed in the left cerebral hemisphere</option>
+                                            <option class="" value="Scan needed in the left cerebral hemisphere">Scan needed in the left cerebral hemisphere</option>
                                         </select>
                                     </div>
                                 </div>
@@ -89,9 +96,9 @@
                                         <label class="text-secondary mb-2">
                                             MRT
                                         </label>
-                                        <select class="form-select text-secondary small" v-model="mri">
-                                            <option class="" :value="null" selected disabled>* Sepcify</option>
-                                            <option class="" ct_scan>Full body MRI</option>
+                                        <select class="form-select text-secondary small" required v-model="mri">
+                                            <option class="" :value="null" disabled>* Sepcify</option>
+                                            <option class="" value="Full body MRI">Full body MRI</option>
                                         </select>
                                     </div>
                                 </div>
@@ -99,7 +106,7 @@
                         </div>
 
                         <div class="d-flex justify-content-end mt-3">
-                            <button class="btn bg-purple fw-bold text-white p-2 text-sm" type="submit">
+                            <button class="btn bg-purple fw-bold text-white p-2 text-sm" type="submit" :disabled="!ct_scan || !mri">
                                 Save and Send
                             </button>
                         </div>
@@ -115,6 +122,8 @@
 <script>
 import { Icon } from "@iconify/vue"
 import Widget from "@/lib/widget"
+import { createToaster } from "@meforma/vue-toaster";
+const toaster = createToaster({ position: 'top-right' });
 
 export default {
     data() {
@@ -182,6 +191,7 @@ export default {
             localStorage.setItem("token", data._rawValue.login, error)
         },
         async update() {
+            Widget.openLoading()
             const query = gql`mutation add($ctscan: String!,$mri: String!, $inv:[ID!]!, $dev:String!){  
                 add_medical_record(
                     ctscan:$ctscan,
@@ -210,8 +220,13 @@ export default {
 
             const { data, error } = await useAsyncQuery(query, variables)
             console.log(data, error)
-            const { $nt } = useNuxtApp()
-            $nt.show("Bataino")
+            if (data._rawValue.add_medical_record.investigations[0])
+                toaster.sucess(`Action Succesfull`);
+            else
+                toaster.error(`Unknown error occured`);
+
+
+            Widget.dismiss()
 
         }
     },
@@ -228,9 +243,11 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less">
+.bg-purple {}
+
 .menu-hover:hover {
-    background-color: var(--purple);
+    background-color: #382f90ff !important;
     color: white !important;
     cursor: pointer;
 }
@@ -245,7 +262,7 @@ export default {
 
 .scroll::-webkit-scrollbar-thumb {
     background-color: darkgrey;
-    visibility: hidden;
+    display: hidden;
 }
 
 .scroll::-webkit-scrollbar {
