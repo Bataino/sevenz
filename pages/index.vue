@@ -151,7 +151,7 @@ export default {
     },
     methods: {
         async getCategories() {
-            Widget.openLoading()
+            // Widget.openLoading()
             const query = gql`query {
                 investigation_types {
                         id
@@ -220,8 +220,12 @@ export default {
 
             const { data, error } = await useAsyncQuery(query, variables)
             console.log(data, error)
-            if (data._rawValue.add_medical_record.investigations[0])
-                toaster.sucess(`Action Succesfull`);
+            if (data._rawValue.add_medical_record.investigations[0]) { 
+                toaster.success(`Action Succesfull`);
+                this.tests.forEach((test) => {
+                    test.investigations.forEach((e) => e.isSelected = false)
+                })
+            }
             else
                 toaster.error(`Unknown error occured`);
 
@@ -231,6 +235,7 @@ export default {
         }
     },
     async beforeMount() {
+        Widget.openLoading()
         // this.$root.$loading.start();
         if (localStorage.getItem("token") == undefined || localStorage.getItem("token") == null || !localStorage.getItem("token")) {
             await this.login()
@@ -239,6 +244,8 @@ export default {
         console.log("Token", localStorage.getItem("token"))
 
 
+    },
+    created(){
     }
 }
 </script>
